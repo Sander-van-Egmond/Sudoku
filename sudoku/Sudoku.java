@@ -5,11 +5,16 @@ public class Sudoku {
 	Field roster = new Field();
 	
 	public static void main(String[] args){
+		long startTime = System.currentTimeMillis();
 		Sudoku mySudoku = new Sudoku();
 		mySudoku.readInit(args[0]);
 		mySudoku.printInitial();
 		mySudoku.solver();
 		mySudoku.printSolved();
+		long endTime   = System.currentTimeMillis();
+		long totalTime = endTime - startTime;
+		System.out.println("Solved in "+totalTime+" miliseconds");
+
 	}
 	
 	void readInit(String field){
@@ -24,6 +29,8 @@ public class Sudoku {
 				current.options.add(current.value);
 			}
 			roster.addNumber(current);
+			
+
 		}
 	}
 	
@@ -44,23 +51,15 @@ public class Sudoku {
 				Number current = roster.field.get(i);
 				if (current.value == 0){
 					solveNext(current);
-						
-					
 				}
 			}
-	
 			for (int i=0 ; i<81 ; i++){
 				Number current = roster.field.get(i);
-				
 				if (current.value == 0){
-					
-					solveDetailed(current);
-					
+					solveDetailed(current);	
 				}
 			}
-			printSolved();
-		}
-		
+		}	
 	}
 	
 	void solveNext(Number current){
@@ -76,22 +75,25 @@ public class Sudoku {
 				}
 			}
 		}
-		
 		current.options=options;
-		/*
-		System.out.print(options.size()+": ");
-		for (int x : options){
-			System.out.print(x);
-		}
-		System.out.println();
-		*/
 		
 		if (options.size() == 1){
 			current.value=options.get(0);
 			current.options.clear();
+			for (int i=0 ; i<81 ; i++){
+				Number check = roster.field.get(i);
+				if (check.row == current.row && check.options.contains(current.value)){
+					check.options.remove(new Integer(current.value));
+				}
+				if (check.column == current.column  && check.options.contains(current.value)){
+					check.options.remove(new Integer(current.value));
+				}
+				if (check.box == current.box && check.options.contains(current.value)){
+					check.options.remove(new Integer(current.value));
+				}
+			}
 			return;
 		}
-		//System.out.println(current.options.size());
 	}
 	
 	void solveDetailed(Number current){
@@ -111,82 +113,30 @@ public class Sudoku {
 				optionsBox.addAll(check.options);
 			}
 		}
-		//optionsColumn.removeAll(current.options);
-		//optionsBox.removeAll(current.options);
-		/*
-		current.printProperties();
 		
-		System.out.print(current.options.size());
-		System.out.print("options: ");
-		for (int x : current.options){
-			System.out.print(x);
-		}
-		System.out.println();
-		
-		System.out.print("row: ");
-		for (Integer row : optionsRow){
-			System.out.print(row);
-		
-		}
-		System.out.println();
-		
-		System.out.print("column: ");
-		for (Integer row : optionsColumn){
-			System.out.print(row);
-		
-		}
-		System.out.println();
-		
-		System.out.print("box: ");
-		for (Integer row : optionsBox){
-			System.out.print(row);
-		
-		}
-		System.out.println();
-		*/
 		for (int x : current.options){
 			optionsRow.remove(new Integer(x));
 			optionsColumn.remove(new Integer(x));
 			optionsBox.remove(new Integer(x));
 		}
-		
-		/*
-		System.out.print(current.options.size());
-		System.out.print("options: ");
-		for (int x : current.options){
-			System.out.print(x);
-		}
-		System.out.println();
-		
-		System.out.print("row: ");
-		for (Integer row : optionsRow){
-			System.out.print(row);
-		
-		}
-		System.out.println();
-		
-		System.out.print("column: ");
-		for (Integer row : optionsColumn){
-			System.out.print(row);
-		
-		}
-		System.out.println();
-		
-		System.out.print("box: ");
-		for (Integer row : optionsBox){
-			System.out.print(row);
-		
-		}
-		System.out.println();
-		*/
-
-		
-		
+				
 		for (int option : current.options){
 			
 			if (!optionsRow.contains(option)||!optionsColumn.contains(option)||!optionsBox.contains(option)){
 				current.value = option;
 				current.options.clear();
+				for (int i=0 ; i<81 ; i++){
+					Number check = roster.field.get(i);
+					if (check.row == current.row && check.options.contains(option)){
+						check.options.remove(new Integer(option));
+					}
+					if (check.column == current.column  && check.options.contains(option)){
+						check.options.remove(new Integer(option));
+					}
+					if (check.box == current.box && check.options.contains(option)){
+						check.options.remove(new Integer(option));
+					}
+				}
 				return;
 			}
 		}
@@ -217,14 +167,11 @@ public class Sudoku {
 			else{
 				System.out.print(current.value);
 			}
-		
 			System.out.print("|");
-		
 		}
 		System.out.println();
 		System.out.println("-------------------");
 	}
-	
 }
 
 
@@ -234,10 +181,6 @@ class Number{
 	int box;
 	int value = 0;
 	ArrayList<Integer> options =  new ArrayList<Integer>();
-	
-	public Number(){
-		
-	}
 	
 	void printProperties(){
 		System.out.println("row: "+row);
